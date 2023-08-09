@@ -1,0 +1,52 @@
+<%- include('layout.ejs'); %>
+    <div style="margin-left: 2em;">
+        <h1>List Files</h1>
+    <div class="input-group mb-3" style="width: 50%;">
+        <input type="text" class="form-control" placeholder="Nama File" id="nama_file">
+        <button class="btn btn-outline-secondary" type="button" id="btn_search">Cari</button>
+    </div>
+    </div>
+    <table class="table table-striped" style="width: 100%; margin-top: 1em;">
+        <thead>
+            <tr>
+                <th scope="col">ID Files</th>
+                <th scope="col">File 1</th>
+                <th scope="col">File 2</th>
+                <th scope="col">File 3</th>
+                <th scope="col">Link Zoom</th>
+                <th scope="col">Tanggal Upload</th>
+                <th scope="col">Uploader</th>
+            </tr>
+        </thead>
+
+
+        <tbody>
+            <% files.forEach(function(file){ %>
+                <tr>
+                    <th scope="row">
+                        <%= file.id %>
+                    </th>
+                    <th><a target="_blank" href=show/<%=file.file1_path %>><%= file.file1_name %></a></th>
+                    <th><a target="_blank" href=show/<%=file.file2_path %>><%= file.file2_name %></a></th>
+                    <th><a target="_blank" href=show/<%=file.file3_path %>><%= file.file3_name %></a></th>
+                    <th>
+                        <%= file.link_zoom %>
+                    </th>
+                    <th>
+                        <%= file.createdAt%>
+                    </th>
+                    <th>
+                        <%= file.createdBy %>
+                    </th>
+                </tr>
+                <% }); %>
+        </tbody>
+    </table>
+
+    <script>
+        const namaFile = document.getElementById('nama_file')
+        const btnSearch = document.getElementById('btn_search')
+        btnSearch.addEventListener('click', function (e) {
+            window.location.replace(`/admin/list?filename=${namaFile.value}`)
+        })
+    </script>
