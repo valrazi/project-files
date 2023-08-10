@@ -34,8 +34,11 @@
                     <div class="form_container">
                         <div class="input_wrap">
                             <label for="file1">File 1</label>
+                            <p>Existing File: <a style="font-weight: bold;" href=../show/<%=file.file1_path %>><%=
+                                        file.file1_name %></a> </p>
+
                             <input type="file" name="file1" class="input" id="file1" required
-                                onchange="return fileValidation('file1')">
+                                onchange="return fileValidation('file1', 1)">
                         </div>
                     </div>
 
@@ -45,18 +48,23 @@
                     <div class="form_container">
                         <div class="input_wrap">
                             <label for="file2">File 2</label>
+                            <p>Existing File: <a style="font-weight: bold;" href=../show/<%=file.file2_path %>><%=
+                                file.file2_name %></a> </p>
                             <input type="file" name="file2" class="input" id="file2" required
-                            onchange="return fileValidation('file2')">
+                                onchange="return fileValidation('file2', 2)">
                         </div>
                     </div>
                 </div>
                 <div class="form_3 data_info" style="display: none;">
                     <h2>File 3</h2>
+                    
                     <div class="form_container">
                         <div class="input_wrap">
                             <label for="file2">File 3</label>
+                            <p>Existing File: <a style="font-weight: bold;" href=../show/<%=file.file3_path %>><%=
+                                file.file3_name %></a> </p>
                             <input type="file" name="file3" class="input" id="file3" required
-                            onchange="return fileValidation('file3')">
+                                onchange="return fileValidation('file3', 3)">
                         </div>
                     </div>
                 </div>
@@ -353,7 +361,7 @@
         }
     </style>
     <script>
-        function fileValidation(idInput) {
+        function fileValidation(idInput, code) {
             const fileInput = document.getElementById(`${idInput}`)
             const fileValue = fileInput.value
             const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.pdf|\.txt|\.doc|\.docx|\.xls|\.xlsx|\.ppt|\.pptx|\.txt)$/i;
@@ -362,6 +370,19 @@
                 fileInput.value = '';
                 return false;
             }
+            if (fileValue.length > 0) {
+                switch (code) {
+                    case 1:
+                        form_1_next_btn.innerHTML = 'Update'
+                        break;
+                    case 2:
+                        form_2_next_btn.innerHTML = 'Update'
+                        break;
+                    case 3:
+                        btn_done.innerHTML = "Update"
+                }
+            }
+
         }
         var form_1 = document.querySelector(".form_1");
         var form_2 = document.querySelector(".form_2");
@@ -396,21 +417,41 @@
         let inputFileThree = document.getElementById('file3')
         // let inputLinkZoom = document.getElementById("link_zoom")
 
-        form_1_next_btn.addEventListener("click", function () {
-            if (inputFileOne.files.length > 0) {
+        const fileId = <%=file.id %>
+            form_1_next_btn.addEventListener("click", function () {
+                if (inputFileOne.files.length > 0) {
+                    const file = inputFileOne.files[0]
+                    const formData = new FormData()
+                    formData.append("file", file)
+                    formData.append("code", 1)
+                    fetch(`/admin/file/${fileId}`, {
+                        method: 'POST',
+                        body: formData,
 
-                form_1.style.display = "none";
-                form_2.style.display = "block";
+                    }).then((res) => {
+                        alert('succes update file!')
+                        form_1.style.display = "none";
+                        form_2.style.display = "block";
 
-                form_1_btns.style.display = "none";
-                form_2_btns.style.display = "flex";
+                        form_1_btns.style.display = "none";
+                        form_2_btns.style.display = "flex";
 
-                form_2_progessbar.classList.add("active");
-            } else {
-                alert('File can\'t be null!')
-            }
+                        form_2_progessbar.classList.add("active");
+                        return res
+                    }).catch((err) => {
+                        alert('error updating file')
+                        console.log(err);
+                    })
+                } else {
+                    form_1.style.display = "none";
+                    form_2.style.display = "block";
 
-        });
+                    form_1_btns.style.display = "none";
+                    form_2_btns.style.display = "flex";
+
+                    form_2_progessbar.classList.add("active");
+                }
+            });
 
         form_2_back_btn.addEventListener("click", function () {
             form_1.style.display = "block";
@@ -424,6 +465,29 @@
 
         form_2_next_btn.addEventListener("click", function () {
             if (inputFileTwo.files.length > 0) {
+                const file = inputFileTwo.files[0]
+                const formData = new FormData()
+                formData.append("file", file)
+                formData.append("code", 2)
+                fetch(`/admin/file/${fileId}`, {
+                    method: 'POST',
+                    body: formData,
+
+                }).then((res) => {
+                    alert('succes update file!')
+                    form_2.style.display = "none";
+                    form_3.style.display = "block";
+
+                    form_3_btns.style.display = "flex";
+                    form_2_btns.style.display = "none";
+
+                    form_3_progessbar.classList.add("active");
+                    return res
+                }).catch((err) => {
+                    alert('error updating file')
+                    console.log(err);
+                })
+            } else {
                 form_2.style.display = "none";
                 form_3.style.display = "block";
 
@@ -431,8 +495,6 @@
                 form_2_btns.style.display = "none";
 
                 form_3_progessbar.classList.add("active");
-            } else {
-                alert(`file can't be null`)
             }
         });
 
@@ -469,29 +531,24 @@
         // });
         btn_done.addEventListener("click", function () {
             if (inputFileThree.files.length > 0) {
-                const fileOne = inputFileOne.files[0]
-                const fileTwo = inputFileTwo.files[0]
-                const fileThree = inputFileThree.files[0]
+                const file = inputFileThree.files[0]
                 const formData = new FormData()
-                formData.append("files", fileOne)
-
-                formData.append("files", fileTwo)
-
-                formData.append("files", fileThree)
-                fetch("/admin/upload", {
+                formData.append("file", file)
+                formData.append("code", 3)
+                fetch(`/admin/file/${fileId}`, {
                     method: 'POST',
                     body: formData,
 
                 }).then((res) => {
-                    console.log(res);
-
-                }).catch(err => {
+                    alert('succes update file!')
+                    window.location.replace('/admin/list')
+                    return res
+                }).catch((err) => {
+                    alert('error updating file')
                     console.log(err);
                 })
-
-                modal_wrapper.classList.add("active");
             } else {
-                alert(`file can't be null`)
+                window.location.replace('/admin/list')
             }
         })
 

@@ -82,9 +82,9 @@ module.exports = {
     try {
       await db.files.create({
         data: {
-          file1_path:encodeURI(arrFiles[0].filename),
-          file2_path:encodeURI(arrFiles[1].filename),
-          file3_path:encodeURI(arrFiles[2].filename),
+          file1_path: encodeURI(arrFiles[0].filename),
+          file2_path: encodeURI(arrFiles[1].filename),
+          file3_path: encodeURI(arrFiles[2].filename),
           file1_name: arrFiles[0].originalname,
           file2_name: arrFiles[1].originalname,
           file3_name: arrFiles[2].originalname,
@@ -103,9 +103,9 @@ module.exports = {
     //     page = Number(req.query.page)
     //   }
     // }
-    if(req.query.filename && req.query.filename.length > 0) {
-      
-      const files =  await db.files.findMany({
+    if (req.query.filename && req.query.filename.length > 0) {
+
+      const files = await db.files.findMany({
         where: {
           OR: [
             {
@@ -133,41 +133,41 @@ module.exports = {
         }
       })
       arrFiles = files
-    }else {
+    } else {
       arrFiles = await db.files.findMany({
         orderBy: {
           createdAt: 'asc'
         }
       })
     }
-    res.render("list_file", {files: arrFiles})
+    res.render("list_file", { files: arrFiles })
   },
   async downloadFiles(req, res) {
     const fileName = req.params.fileName
-    const pathFile = `${appRoot}/uploads/${fileName}` 
+    const pathFile = `${appRoot}/uploads/${fileName}`
     res.download(pathFile)
   },
-  async showFiles(req, res){
+  async showFiles(req, res) {
     const fileName = req.params.fileName
-    const pathFile = `${appRoot}/uploads/${fileName}` 
-    fs.readFile(pathFile, function(err, data) {
-        if(err){
-            console.log(err);
-            res.send(err)
-        }
-        res.end(data)
+    const pathFile = `${appRoot}/uploads/${fileName}`
+    fs.readFile(pathFile, function (err, data) {
+      if (err) {
+        console.log(err);
+        res.send(err)
+      }
+      res.end(data)
     })
   },
-  async updateLinkZoom(req, res){
+  async updateLinkZoom(req, res) {
     try {
       const fileId = req.params.fileId
-      const {link_zoom} = req.body
+      const { link_zoom } = req.body
       const fileFound = await db.files.findUnique({
         where: {
           id: Number(fileId)
         }
       })
-      if(fileFound) {
+      if (fileFound) {
         await db.files.update({
           where: {
             id: Number(fileId)
@@ -188,6 +188,83 @@ module.exports = {
 
       return res.status(404).json({
         error: 'file not found'
+      })
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: error
+      })
+    }
+  },
+  async editFiles(req, res) {
+    try {
+      const fileId = req.params.fileId
+      const fileFound = await db.files.findUnique({
+        where: {
+          id: Number(fileId)
+        }
+      })
+      if (fileFound) {
+        return res.render('edit_file', { file: fileFound })
+      }
+      return res.redirect('/admin/list')
+    } catch (error) {
+      console.log(error);
+      return res.redirect('/admin/list')
+    }
+  },
+  async editFileDB(req, res){
+    try {
+      const fileId = req.params.fileId
+      const file = req.file
+      const code = Number(req.body.code)
+      const fileFound = await db.files.findUnique({
+        where: {
+          id: Number(fileId)
+        }
+      })
+      if (fileFound) {
+        switch(code) {
+          case 1:
+            await db.files.update({
+              where: {
+                id: Number(fileId)
+              },
+              data: {
+                file1_name: file.originalname,
+                file1_path: file.filename
+              }
+            })
+            break;
+          case 2:
+            await db.files.update({
+              where: {
+                id: Number(fileId)
+              },
+              data: {
+                file2_name: file.originalname,
+                file2_path: file.filename
+              }
+            })
+            break;
+          case 3:
+            await db.files.update({
+              where: {
+                id: Number(fileId)
+              },
+              data: {
+                file3_name: file.originalname,
+                file3_path: file.filename
+              }
+            })
+            break;
+        }
+        return res.status(200).json({
+          data: 'success'
+        })
+      }
+      return res.status(400).json({
+        error: 'file not found!'
       })
     } catch (error) {
       console.log(error);
