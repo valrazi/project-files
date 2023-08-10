@@ -77,7 +77,7 @@ module.exports = {
   },
   async uploadFiles(req, res) {
     const arrFiles = req.files;
-    const adminLoggedIn = req.session.adminId;
+    const adminLoggedIn = req.session.adminId ? req.session.adminId : 'public';
 
     try {
       await db.files.create({

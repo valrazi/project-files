@@ -20,8 +20,8 @@ router.post('/login', loginAdmin)
 router.post('/register', registerAdmin)
 router.get('/logout', logoutAdmin)
 
-router.get("/upload", isAdmin, uploadView)
-router.post('/upload', isAdmin,multer({ storage: diskStorage }).array("files"), uploadFiles)
+router.get("/upload", uploadView)
+router.post('/upload',multer({ storage: diskStorage }).array("files"), uploadFiles)
 
 router.get("/list",isAdmin,listView)
 router.get("/download/:fileName" , downloadFiles)
