@@ -16,6 +16,7 @@
                 <th scope="col">Link Zoom</th>
                 <th scope="col">Tanggal Upload</th>
                 <th scope="col">Uploader</th>
+                <th scope="col">Edit</th>
             </tr>
         </thead>
 
@@ -37,6 +38,9 @@
                     </th>
                     <th>
                         <%= file.createdBy %>
+                    </th>
+                    <th>
+                        <a class="btn btn-info" href=admin/file/<%= file.id %>>Edit File</a>
                     </th>
                 </tr>
                 <% }); %>

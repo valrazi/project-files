@@ -28,6 +28,6 @@ router.get("/download/:fileName" , downloadFiles)
 router.get("/show/:fileName", showFiles)
 
 router.put('/file/:fileId', updateLinkZoom)
-router.get('/file/:fileId', isAdmin,editFiles)
-router.post('/file/:fileId', isAdmin,multer({storage:diskStorage}).single('file'),editFileDB)
+router.get('/file/:fileId', editFiles)
+router.post('/file/:fileId', multer({storage:diskStorage}).single('file'),editFileDB)
 module.exports = router
